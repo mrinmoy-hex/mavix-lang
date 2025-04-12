@@ -1,6 +1,6 @@
 #include <stdlib.h>
 
-#include "include/memory.h"
+#include "memory.h"
 
 // Function for handling all dynamic memory management in "mavix"
 
