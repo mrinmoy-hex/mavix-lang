@@ -19,7 +19,12 @@ typedef struct {
 // Initializes a Chunk structure (allocates initial memory, sets counts to zero, etc.)
 void initChunk(Chunk* chunk);
 
+// Freeing the memory
+void freeChunk(Chunk* chunk);
+
 // Appends a byte to the Chunk's code array, resizing if necessary
 void writeChunk(Chunk* chunk, uint8_t byte);
+
+
 
 #endif
