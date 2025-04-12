@@ -13,6 +13,11 @@
         sizeof(type) * (newCount))
 
 
+// Macro for freeing allocated memory
+#define FREE_ARRAY(type, pointer, oldCount) \
+    reallocate(pointer, sizeof(type) * (oldCount), 0)
+
+
 // Reallocates memory block to new size
 void* reallocate(void* pointer, size_t oldSize, size_t newSize);
 
