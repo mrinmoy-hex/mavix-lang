@@ -33,8 +33,8 @@ void writeChunk(Chunk* chunk, uint8_t byte) {
     chunk->count++;
 }
 
-// Method to add a new constant to the chunk and returns the index of the addconstant
+// Method to add a new constant to the chunk and returns the index of the previous constant
 int addConstant(Chunk* chunk, Value value) {
     writeValueArray(&chunk->constants, value);
-    return chunk->constants.count + 1;
+    return chunk->constants.count - 1;
 }
