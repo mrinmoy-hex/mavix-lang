@@ -4,3 +4,4 @@
 *.log
 *.d
 *.dSYM
+/cmake-build-debug
