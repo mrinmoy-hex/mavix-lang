@@ -14,6 +14,7 @@ typedef struct {
     int count;          // Array element count
     int capacity;       // Number of allocated entried in use
     uint8_t* code;      // Pointer to the array of bytecode instructions
+    int* lines;
     ValueArray constants;
 } Chunk;
 
@@ -26,7 +27,7 @@ void initChunk(Chunk* chunk);
 void freeChunk(Chunk* chunk);
 
 // Appends a byte to the Chunk's code array, resizing if necessary
-void writeChunk(Chunk* chunk, uint8_t byte);
+void writeChunk(Chunk* chunk, uint8_t byte, int line);
 
 int addConstant(Chunk* chunk, Value value);
 
