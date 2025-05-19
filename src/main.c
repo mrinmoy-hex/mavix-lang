@@ -22,6 +22,9 @@ int main(int argc, const char* argv[]) {
 
     disassembleChunk(&chunk, "test chunk");
 
+    // Activates VM
+    interpret(&chunk);
+
     // winding down the VM
     freeVM();
     freeChunk(&chunk);

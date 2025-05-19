@@ -13,3 +13,14 @@ void initVM() {
 void freeVM() {
 
 }
+
+static InterpretResult run() {
+
+}
+
+
+InterpretResult interpret(Chunk* chunk) {
+    vm.chunk = chunk;
+    vm.ip = vm.chunk->code;
+    return run();
+}
