@@ -3,8 +3,11 @@
 #include "chunk.h"
 #include "debug.h"
 #include "value.h"
+#include "vm.h"
 
 int main(int argc, const char* argv[]) {
+    initVM();
+
     Chunk chunk;
     
     // Initializing the chunk 
@@ -19,6 +22,8 @@ int main(int argc, const char* argv[]) {
 
     disassembleChunk(&chunk, "test chunk");
 
+    // winding down the VM
+    freeVM();
     freeChunk(&chunk);
 
     return 0;
