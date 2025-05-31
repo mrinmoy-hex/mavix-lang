@@ -1,7 +1,4 @@
 /build/
 .idea/
 .vscode/
-*.log
-*.d
-*.dSYM
 /cmake-build-debug
