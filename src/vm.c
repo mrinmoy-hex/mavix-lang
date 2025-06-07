@@ -52,18 +52,27 @@ When this flag is defined, the VM disassembles and prints each instruction right
 executing it.
 */
 #ifdef DEBUG_TRACE_EXECUTION
-        disassembleInstruction(vm.chunk, (int) (vm.ip - vm.chunk->code ));  // computes the current offset
+    // show the current content of the stack
+    printf("          ");
+    for (Value* slot = vm.stack; slot < vm.stackTop; slot++) {
+        printf("[ ");
+        printValue(*slot);
+        printf(" ]");
+    }
+    printf("\n");
+    disassembleInstruction(vm.chunk, (int) (vm.ip - vm.chunk->code ));  // computes the current offset
 #endif 
 
         uint8_t instruction;
         switch (instruction = READ_BYTE()) {
             case OP_CONSTANT: {
                 Value constant = READ_CONSTANT();
-                printValue(constant);
-                printf("\n");
+                push(constant);
                 break;
             }
             case OP_RETURN: {
+                printValue(pop());
+                printf("\n");
                 return INTERPRET_OK;
             }
         }
