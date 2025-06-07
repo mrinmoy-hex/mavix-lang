@@ -11,9 +11,7 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 file(GLOB SOURCES "src/*.c")
 
 # Add the executable
-add_executable("mavix" ${SOURCES}
-        include/vm.h
-        src/vm.c)
+add_executable("mavix" ${SOURCES})
 
 # Include directories for header files
 include_directories("include")
