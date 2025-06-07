@@ -3,6 +3,7 @@
 //
 #include "common.h"
 #include "vm.h"
+#include "debug.h"
 
 #include <stdio.h>
 
@@ -20,9 +21,25 @@ void freeVM() {
 static InterpretResult run() {
     // helper macros
 #define READ_BYTE() (*vm.ip++)      // reads the current byte and advances it
+/* @note  
+ * Uses READ_BYTE() to get the index of a constant in the constants array.
+ *
+ * @return:
+ *  Returns the Value at that index. 
+ * */
 #define READ_CONSTANT() (vm.chunk->constants.values[READ_BYTE()])
 
     for (;;) {
+    
+    // For diagnostic logging 
+/* 
+When this flag is defined, the VM disassembles and prints each instruction right before 
+executing it.
+*/
+#ifdef DEBUG_TRACE_EXECUTION
+        disassembleInstruction(vm.chunk, (int) (vm.ip - vm.chunk->code ));  // computes the current offset
+#endif 
+
         uint8_t instruction;
         switch (instruction = READ_BYTE()) {
             case OP_CONSTANT: {

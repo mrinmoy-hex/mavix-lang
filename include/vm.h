@@ -13,7 +13,7 @@ typedef struct {
 } VM;
 
 
-// VM response
+// VM responses
 typedef enum {
     INTERPRET_OK,
     INTERPRET_COMPILE_ERROR,
@@ -23,6 +23,7 @@ typedef enum {
 
 void initVM();
 void freeVM();
+
 // main entrypoint of VM
 InterpretResult interpret(Chunk* chunk);
 
