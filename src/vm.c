@@ -70,6 +70,13 @@ executing it.
                 push(constant);
                 break;
             }
+            /*
+            @note 
+            The instruction needs a value to operate on, which it gets by popping from the 
+            stack. It negates that, then pushes the result back on for later instructions to use.
+            */
+            case OP_NEGATE:     push(-pop()); break;
+
             case OP_RETURN: {
                 printValue(pop());
                 printf("\n");
