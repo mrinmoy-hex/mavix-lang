@@ -8,20 +8,14 @@
 #include "compiler.h"
 #include "scanner.h"
 
-void compile(const char* source) {
+/*
+Working mechanism of compiler (Mavix)
+- The compiler will take the user’s program and fill up the chunk with bytecode.
+Then it sends the completed chunk over to the VM to be executed. 
+*/
+bool compile(const char* source, Chunk* chunk) {
     initScanner(source);
-    // tmp code
-    int line = -1;
-    for (;;) {
-        Token token = scanToken();
-        if (token.line != line) {       // in case of new line
-            printf("%4d", token.line);
-            line = token.line;
-        } else {
-            printf("    | ");
-        } 
-        printf("%2d '%.*s'\n", token.type, token.length, token.start);
-
-        if (token.type == TOKEN_EOF) break;
-    }
+    advance();
+    expression();
+    consume(TOKEN_EOF, "Expect end of expression.");
 }
