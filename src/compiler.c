@@ -19,6 +19,12 @@ typedef struct {
 
 Parser parser;
 
+Chunk* compilingChunk;
+
+static Chunk* currentChunk() {
+    return compilingChunk;
+}
+
 
 // Reports a syntax error at the given token with the provided message
 static void errorAt(Token* token, const char* message) {
@@ -95,6 +101,38 @@ static void consume(TokenType type, const char* message) {
 }
 
 
+/*
+#####################################
+Emitting Bytecode
+#####################################
+*/
+
+// Emits a single byte (usually an opcode or operand) into the current Chunk.
+// Associates it with the source line for debugging and error reporting.
+
+static void emitByte(uint8_t byte) {
+    writeChunk(currentChunk(), byte, parser.previous.line);
+}
+
+// Emits two bytes in sequence. Used for opcodes that require operands.
+// Example: OP_CONSTANT <index>
+static void emitBytes(uint8_t byte1, uint8_t byte2) {
+    emitByte(byte1);    // Usually the opcode
+    emitByte(byte2);    // Usually the operand (like index into constant table)
+}
+
+// Called at the end of compilation to finish the function.
+// Emits a return instruction so the VM knows when to stop executing.
+static void endCompiler() {
+    emitReturn();
+}
+
+// Emits the OP_RETURN instruction (tells the VM to return from the function).
+static void emitReturn() {
+    emitByte(OP_RETURN);
+}
+
+
 
 /*
 Working mechanism of compiler (Mavix)
@@ -103,6 +141,7 @@ Then it sends the completed chunk over to the VM to be executed.
 */
 bool compile(const char* source, Chunk* chunk) {
     initScanner(source);
+    compilingChunk = chunk;     // Initializes the Chunk (for writing bytecode)
 
     parser.hadError = false;
     parser.panicMode = false;
@@ -110,6 +149,7 @@ bool compile(const char* source, Chunk* chunk) {
     advance();
     expression();
     consume(TOKEN_EOF, "Expect end of expression.");
+    endCompiler();
 
     return !parser.hadError;
 }
