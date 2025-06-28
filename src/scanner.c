@@ -262,7 +262,7 @@ static TokenType identifierType() {
  * @return Token representing the scanned identifier.
  */
 static Token identifier() {
-    while (!isAlpha(peek()) || isDigit(peek())) advance();
+    while (isAlpha(peek()) || isDigit(peek())) advance();
     return makeToken(identifierType());
 }
 
