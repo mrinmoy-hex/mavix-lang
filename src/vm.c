@@ -15,6 +15,16 @@ static void resetStack() {
     vm.stackTop = vm.stack;
 }
 
+/**
+ * @brief Reports a runtime error with a formatted message.
+ *
+ * This function prints a formatted error message to the standard error output,
+ * using a format string and a variable number of arguments (similar to printf).
+ * It is typically used to display errors that occur during the execution of the virtual machine.
+ *
+ * @param format The format string for the error message.
+ * @param ...    Additional arguments to be formatted into the message.
+ */
 static void runtimeError(const char* format, ...) {
     va_list args;
     va_start(args, format);
@@ -56,6 +66,16 @@ static bool isFalsey(Value value) {
 }
 
 
+/**
+ * Executes the main interpreter loop for the virtual machine.
+ *
+ * This function runs the bytecode instructions loaded into the VM,
+ * managing the instruction pointer, stack, and other VM state.
+ * It processes instructions until a return or error condition is encountered.
+ *
+ * @return InterpretResult The result of the interpretation, indicating
+ *         success, runtime error, or compile error.
+ */
 static InterpretResult run() {
     // helper macros
 #define READ_BYTE() (*vm.ip++)      // reads the current byte and advances it
@@ -108,6 +128,14 @@ executing it.
             case OP_NIL: push(NIL_VAL); break;
             case OP_TRUE: push(BOOL_VAL(true)); break;
             case OP_FALSE: push(BOOL_VAL(false)); break;
+            case OP_EQUAL: {
+                Value b = pop();
+                Value a = pop();
+                push(BOOL_VAL(valuesEqual(a, b)));
+                break;
+            }
+            case OP_GREATER:  BINARY_OP(BOOL_VAL, >); break;
+            case OP_LESS:     BINARY_OP(BOOL_VAL, <); break;
 
             case OP_ADD:        BINARY_OP(NUMBER_VAL, +); break;
             case OP_SUBTRACT:   BINARY_OP(NUMBER_VAL, -); break;
@@ -145,6 +173,16 @@ executing it.
 
 
 
+/**
+ * @brief Interprets the given source code.
+ *
+ * This function takes a string containing source code and executes it
+ * using the virtual machine. It returns an InterpretResult indicating
+ * the outcome of the interpretation, such as success or the type of error encountered.
+ *
+ * @param source A null-terminated string containing the source code to interpret.
+ * @return InterpretResult The result of interpreting the source code.
+ */
 InterpretResult interpret(const char* source) {
     Chunk chunk;
     initChunk(&chunk);
