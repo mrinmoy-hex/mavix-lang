@@ -18,3 +18,6 @@ include_directories("include")
 
 # Compiler flags
 add_compile_options(-Wall -Wextra -O2 -pedantic)
+
+# Enable debug bytecode printing
+# target_compile_definitions(mavix PRIVATE DEBUG_PRINT_CODE)

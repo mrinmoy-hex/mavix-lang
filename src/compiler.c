@@ -9,6 +9,10 @@
 #include "compiler.h"
 #include "scanner.h"
 
+#ifdef DEBUG_PRINT_CODE
+#include "debug.h"
+#endif
+
 
 typedef struct {
     Token current;
@@ -64,7 +68,7 @@ static void errorAt(Token* token, const char* message) {
     parser.panicMode = true;
 
     // Print the error message with line number
-    fprintf(stderr, "[line %d] Error", token->line);
+    fprintf(stderr, "[line %d] Error ", token->line);
 
     if (token->type == TOKEN_EOF) {
         // If at end of file, indicate that.
@@ -99,8 +103,7 @@ static void errorAtCurrent(const char* message) {
  * @brief Advances the current position in the input stream.
  *
  * This function is responsible for moving the current position
- * forward in the input stream. It is typically used in the context
- * of a compiler or interpreter to process the next character or token.
+ * forward in the input stream.
  */
 static void advance() {
     parser.previous = parser.current;
@@ -191,7 +194,14 @@ static void emitConstant(Value value) {
 // Emits a return instruction so the VM knows when to stop executing.
 static void endCompiler() {
     emitReturn();
+
+#ifdef DEBUG_PRINT_CODE
+    if (!parser.hadError) {
+        disassembleChunk(currentChunk(), "code");
+    }
+#endif
 }
+
 
 /*
 #############################
@@ -208,9 +218,14 @@ static void parsePrecedence(Precedence precedence);
 // infix parser for binary operations
 static void binary() {
     TokenType operatorType = parser.previous.type;
+
+    // get the parsing rule to find precedence level of this operation
     ParseRule* rule = getRule(operatorType);
+
+    // parse the right-hand operand with higher precedence (to bind tightly)
     parsePrecedence((Precedence)(rule->precedence + 1));
 
+    // Emit the corresponding bytecode instruction for the binary operator
     switch (operatorType) {
         case TOKEN_PLUS:          emitByte(OP_ADD); break;
         case TOKEN_MINUS:         emitByte(OP_SUBTRACT); break;
@@ -310,7 +325,23 @@ ParseRule rules[] = {
  * @param precedence The precedence level to parse expressions for.
  */
 static void parsePrecedence(Precedence precedence) {
+    advance();      // read the next token and store it in parser.previous
 
+    // Get the prefix parsing function for the current token
+    ParseFn prefixRule = getRule(parser.previous.type)->prefix;
+    if (prefixRule == NULL) {
+        error("Expect expression.");    // token isn't a valid start of an expression 
+        return;
+    }
+
+    prefixRule();   // parse the prefix part (like number, variable, or grouping)
+
+    // Keep parsing infix expression as long as their precedence is >= current level
+    while (precedence <= getRule(parser.current.type)->precedence) {
+        advance();      // consume the infix operator
+        ParseFn infixRule = getRule(parser.previous.type)->infix;
+        infixRule();    // parse the infix operation (e.g. +, -. *. /)
+    }
 }
 
 
@@ -322,7 +353,7 @@ static ParseRule* getRule(TokenType type) {
 
 
 static void expression() {
-
+    parsePrecedence(PREC_ASSIGNMENT);   // lowest level precedence
 }
 
 
