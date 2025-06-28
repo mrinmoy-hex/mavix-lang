@@ -247,7 +247,7 @@ static void grouping() {
 static void number() {
 
     double value = strtod(parser.previous.start, NULL);     // converts string into double value.
-    emitConstant(value);
+    emitConstant(NUMBER_VAL(value));
 }
 
 
