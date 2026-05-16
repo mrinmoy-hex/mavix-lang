@@ -22,7 +22,7 @@ void writeValueArray(ValueArray *array, Value val) {
 
 void freeValueArray(ValueArray *array) {
     FREE_ARRAY(Value, array->values, array->capacity);
-    initChunk(array);
+    initValueArray(array);
 }
 
 void printValue(Value val) {
