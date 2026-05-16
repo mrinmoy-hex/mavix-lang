@@ -8,11 +8,13 @@ void initChunk(Chunk *chunk) {
     chunk->count = 0;
     chunk->capacity = 0;
     chunk->code = NULL;     // Start empty; allocated on first write 
+    initValueArray(&chunk->constants);
 }
 
 // Deallocate memory and reset chunk
 void freeChunk(Chunk *chunk) {
     FREE_ARRAY(uint8_t, chunk->code, chunk->capacity);
+    freeValueArray(&chunk->constants);
     initChunk(chunk);
 }
 
@@ -27,4 +29,10 @@ void writeChunk(Chunk *chunk, uint8_t byte) {
 
     chunk->code[chunk->count] = byte;
     chunk->count++;
+}
+
+// Adds constant to the constant pool; then returns the index where the constant was appended
+int addConstant(Chunk *chunk, Value val) {
+    writeValueArray(&chunk->constants, val);
+    return chunk->constants.count - 1;
 }
