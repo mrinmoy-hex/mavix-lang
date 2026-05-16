@@ -14,11 +14,16 @@ void freeVM() {
 }
 
 static InterpretResult run() {
+    // Reads the byte currently pointed at by the IP and advances the pointer.
 #define READ_BYTE() (*vm.ip++)
+
+    // Reads a 1-byte index from the bytecode and looks up the corresponding 
+    // constant value from the chunk's constant pool.
 #define READ_CONSTANT() (vm.chunk->constants.values[READ_BYTE()])
 
     for (;;) {
         uint8_t instruction;
+        // Fetch and Decode: Read the opcode and dispatch to the correct case.
         switch (instruction = READ_BYTE()) {
             case OP_CONSTANT: {
                 Value constant = READ_CONSTANT();
@@ -38,6 +43,6 @@ static InterpretResult run() {
 
 InterpretResult interpret(Chunk *chunk) {
     vm.chunk = chunk;
-    vm.ip = vm.chunk->code;
+    vm.ip = vm.chunk->code;    // Point IP to the very first bytecode instruction.
     return run();
 }
