@@ -1,6 +1,9 @@
 #include "common.h"
 #include "vm.h"
+#include "debug.h"
+
 #include <stdio.h>
+
 
 
 VM vm;
@@ -22,6 +25,11 @@ static InterpretResult run() {
 #define READ_CONSTANT() (vm.chunk->constants.values[READ_BYTE()])
 
     for (;;) {
+// Debugging: Disassemble the current instruction before executing it.
+#ifdef DEBUG_TRACE_EXEC
+        disassembleInstruction(vm.chunk, (int)(vm.ip - vm.chunk->code));
+#endif
+
         uint8_t instruction;
         // Fetch and Decode: Read the opcode and dispatch to the correct case.
         switch (instruction = READ_BYTE()) {
