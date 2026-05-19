@@ -4,17 +4,37 @@
 
 #include <stdio.h>
 
-
+/*
+    VM of Mavix
+*/
 
 VM vm;
 
-void initVM() {
+static void resetStack() {
+    vm.stackTop = vm.stack;     // point to very beginning
+}
 
+
+void initVM() {
+    resetStack();
 }
 
 void freeVM() {
 
 }
+
+// Stack Operations
+
+void push(Value value) {
+    *vm.stackTop = value;
+    vm.stackTop++;
+}
+
+Value pop() {
+    vm.stackTop--;
+    return *vm.stackTop;
+}
+
 
 static InterpretResult run() {
     // Reads the byte currently pointed at by the IP and advances the pointer.
