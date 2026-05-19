@@ -48,7 +48,7 @@ static InterpretResult run() {
 // Debugging: Disassemble the current instruction before executing it.
 #ifdef DEBUG_TRACE_EXEC
         printf("          ");
-        for (Value* slot = vm.stack; slot < vm.stackTop, slot++) 
+        for (Value* slot = vm.stack; slot < vm.stackTop; slot++) 
         {
             printf("[ ");
             printValue(*slot);
@@ -67,6 +67,7 @@ static InterpretResult run() {
                 push(constant);
                 break;
             }
+            case OP_NEGATE: push(-pop()); break;
             case OP_RETURN:
                 printValue(pop());
                 printf("\n");
