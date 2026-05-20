@@ -44,10 +44,12 @@ static Token errorToken(const char* message) {
     return token;
 }
 
+// look at the current character without consuming it
 static char peek() {
     return *scanner.current;
 }
 
+// look at the next character without consuming it
 static char peekNext() {
     if (isAtEnd()) return '\0';
     return scanner.current[1];
@@ -100,6 +102,22 @@ static void skipWhitespace() {
                 return;
         }
     }
+}
+
+
+static Token string() {
+    // keep consuming until we find the closing quote or hit the end of file
+    while (peek() != '"' && !isAtEnd()) {
+        // keep track of line numbers in case the string literal spans multiple lines (multiline string)
+        if (peek() == '\n') scanner.line++;
+        advance();
+    }
+
+    if (isAtEnd())  return errorToken("Unterminated string.");
+
+    // The closing quote
+    advance();
+    return makeToken(TOKEN_STRING);
 }
 
 // consume the next character and return it
@@ -156,6 +174,9 @@ Token scanToken() {
             return makeToken(
                 match('=') ? TOKEN_GREATER_EQUAL : TOKEN_GREATER
             );
+
+        // scanning literal tokens
+        case '"': return string();
 
     }
 
