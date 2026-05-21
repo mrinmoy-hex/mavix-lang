@@ -34,6 +34,12 @@ static bool isAtEnd() {
     return *scanner.current == '\0';
 }
 
+// consume the next character and return it
+static char advance() {
+    scanner.current++;
+    return scanner.current[-1];
+}
+
 // create a token with the given type and the current lexeme
 static Token makeToken(TokenType type) {
     Token token;
@@ -68,7 +74,9 @@ static char peekNext() {
 
 static void skipWhitespace() {
     for (;;) {
+
         char c = peek();
+
         switch (c) {
             case ' ':
             case '\r':
@@ -185,7 +193,7 @@ static Token number() {
     while (isDigit(peek())) advance();
 
     // look for a fractional part
-    if (peek() == '.' && isDigit(peekNext)) {
+    if (peek() == '.' && isDigit(peekNext())) {
         // consume the .
         advance();
 
@@ -211,11 +219,6 @@ static Token string() {
     return makeToken(TOKEN_STRING);
 }
 
-// consume the next character and return it
-static char advance() {
-    scanner.current++;
-    return scanner.current[-1];
-}
 
 // if the next character matches the expected one, consume it and return true
 static bool match(char expected) {
@@ -254,7 +257,7 @@ Token scanToken() {
         case '/': return makeToken(TOKEN_SLASH);
         case '*': return makeToken(TOKEN_STAR);
         // two char tokens
-        case: '!':
+        case '!':
             return makeToken(
                 match('=') ? TOKEN_BANG_EQUAL : TOKEN_BANG
             );
