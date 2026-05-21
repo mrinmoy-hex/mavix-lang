@@ -19,6 +19,16 @@ void initScanner(const char* source) {
     scanner.line = 1;
 }
 
+static bool isAlpha(char c) {
+    return (c >= 'a' && c <= 'z') ||
+            (c >='A' && c <= 'Z') ||
+            c == '_';
+}
+
+static bool isDigit(char c) {
+    return c >= '0' && c <= '9';
+}
+
 // check if the scanner has reached the null terminator of the source 
 static bool isAtEnd() {
     return *scanner.current == '\0';
@@ -54,6 +64,7 @@ static char peekNext() {
     if (isAtEnd()) return '\0';
     return scanner.current[1];
 }
+
 
 static void skipWhitespace() {
     for (;;) {
@@ -105,6 +116,86 @@ static void skipWhitespace() {
 }
 
 
+static TokenType checkKeyword(int start, int length, const char* rest, TokenType type) 
+{
+    // check if the total word length matches the keyword length
+    if (scanner.current - scanner.start == start + length) {
+
+        // compare the remaining chars byte-for-byte
+        if (memcmp(scanner.start + start, rest, length) == 0) {
+            return type;    // exact match found
+        }
+    }
+        
+    // default to a regular var name if matching fails
+    return TOKEN_IDENTIFIER;
+}
+
+static TokenType identifierType() {
+    // check the very first letter of the identifier to find matching keywords
+    switch (scanner.start[0]) {
+        case 'a': return checkKeyword(1, 2, "nd", TOKEN_AND),
+        case 'c': return checkKeyword(1, 4, "lass", TOKEN_CLASS);
+        case 'e': return checkKeyword(1, 3, "lse", TOKEN_ELSE);
+        case 'i': return checkKeyword(1, 1, "f", TOKEN_IF);
+        case 'n': return checkKeyword(1, 2, "il", TOKEN_NIL);
+        case 'o': return checkKeyword(1, 1, "r", TOKEN_OR);
+        case 'p': return checkKeyword(1, 4, "rint", TOKEN_PRINT);
+        case 'r': return checkKeyword(1, 5, "eturn", TOKEN_RETURN);
+        case 's': return checkKeyword(1, 4, "uper", TOKEN_SUPER);
+        case 'v': return checkKeyword(1, 2, "ar", TOKEN_VAR);
+        case 'w': return checkKeyword(1, 4, "hile", TOKEN_WHILE);
+
+        // handle keywords starting with 'f' (false, for, fun)
+        case 'f':
+            if (scanner.current - scanner.start > 1) {
+                // check the second letter to route to the correct keyword
+                switch (scanner.start[1]) {
+                    case 'a': return checkKeyword(2, 3, "lse", TOKEN_FALSE);
+                    case 'o': return checkKeyword(2, 1, "r", TOKEN_FOR);
+                    case 'u': return checkKeyword(2, 1, "n", TOKEN_FUN);
+                }
+            }
+            break;
+
+        // handle keywords starting with 't' (this, true)
+        case 't':
+            if (scanner.current - scanner.start > 1) {
+                switch(scanner.start[1]) {
+                    case 'h': return checkKeyword(2, 2, "is", TOKEN_THIS);
+                    case 'r': return checkKeyword(2, 2, "ue", TOKEN_TRUE);
+                }
+            }
+            break;
+    }
+
+    return TOKEN_IDENTIFIER;
+}
+
+
+static Token identifier() {
+    while (isAlpha(peek()) || isDigit(peek()))  advance();
+    return makeToken(identifierType());
+}
+
+
+
+
+static Token number() {
+    while (isDigit(peek())) advance();
+
+    // look for a fractional part
+    if (peek() == '.' && isDigit(peekNext)) {
+        // consume the .
+        advance();
+
+        while (isDigit(peek())) advance();
+    }
+
+    return makeToken(TOKEN_NUMBER);
+}
+
+
 static Token string() {
     // keep consuming until we find the closing quote or hit the end of file
     while (peek() != '"' && !isAtEnd()) {
@@ -134,6 +225,7 @@ static bool match(char expected) {
     return true;
 }
 
+
 // scans the next token from the source and returns it
 Token scanToken() {
     skipWhitespace();
@@ -143,6 +235,10 @@ Token scanToken() {
     if (isAtEnd())  return makeToken(TOKEN_EOF);
 
     char c = advance();
+
+
+    if (isAlpha(c)) return identifier();
+    if (isDigit(c)) return number();
 
     switch (c) {
         // single char
