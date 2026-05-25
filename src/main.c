@@ -11,7 +11,7 @@
 static void repl() {
     char line[1024];
     for (;;) {
-        printf("\x1b[1;36m›\x1b[0m ");
+        printf(">>> ");
 
         if (!fgets(line, sizeof(line), stdin)) {
             printf("\n");
