@@ -91,13 +91,25 @@ static void emitReturn() {
     emitByte(OP_RETURN);
 }
 
+static void emitConstant(Value value) {
+    emitBytes(OP_CONSTANT, makeConstant(value));
+}
+
 // Wraps up compilation tasks once code processing is complete
 static void endCompiler() {
     emitReturn();
 }
 
+// compile number literals
+static void number() {
+    double value = strtod(parser.previous.start, NULL);
+    emitConstant(value);
+}
 
 
+static void expression() {
+    // What goes here?
+}
 
 
 // Orchestrates execution; parses a source code string and populates the given bytecode chunk
