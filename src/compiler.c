@@ -16,6 +16,9 @@ typedef struct {
 Parser parser;
 Chunk* compilingChunk; // The active bytecode array being filled by the compiler
 
+
+//---------------------------------------------------------------
+
 // Returns the active chunk; encapsulated to seamlessly support nested functions later
 static Chunk* currentChunk() {
     return compilingChunk;
@@ -91,6 +94,19 @@ static void emitReturn() {
     emitByte(OP_RETURN);
 }
 
+
+
+static uint8_t makeConstant(Value value) {
+    int constant = addConstant(currentChunk(), value);
+    if (constant > UINT8_MAX) {
+        error("Too many constants in one chunk.");
+        return 0;
+    }
+
+    return (uint8_t)constant;
+}
+
+
 static void emitConstant(Value value) {
     emitBytes(OP_CONSTANT, makeConstant(value));
 }
@@ -107,11 +123,18 @@ static void number() {
 }
 
 
+
+
+
+
+// handling expression
 static void expression() {
     // What goes here?
 }
 
 
+
+// ---------------------------------------------------------
 // Orchestrates execution; parses a source code string and populates the given bytecode chunk
 bool compile(const char* source, Chunk* chunk) {
     initScanner(source);
