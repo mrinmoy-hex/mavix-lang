@@ -175,7 +175,7 @@ static Token errorToken(const char* message) {
  *   - Space, tab, carriage return
  *   - Newlines (increments line counter)
  *   - Single-line comments (//)
- *   - Multi-line block comments (/* ... */)
+ *   - Multi-line block comments
  * 
  * Continues until a non-whitespace, non-comment character is found
  */
