@@ -7,15 +7,34 @@
 #include <stdlib.h>
 #include <string.h>
 
+// ANSI Color Escape Codes
+#define COLOR_RESET   "\x1b[0m"
+#define COLOR_CYAN    "\x1b[36m"
+#define COLOR_GREEN   "\x1b[32m"
+#define COLOR_GRAY    "\x1b[90m"
+
 // Read Eval Print Loop
 static void repl() {
+    // clear the screen and show a banner
+    printf("\033[H\033[J"); // ANSI escape code to clear screen
+    printf(COLOR_CYAN "mavix bytecode interpreter (Version 1.0.0)\n" COLOR_RESET);
+    printf(COLOR_GRAY "Type mavix code below. Press Ctrl+D (or Ctrl+Z on Windows) to exit.\n\n" COLOR_RESET);
+
     char line[1024];
     for (;;) {
-        printf(">>> ");
+        printf(COLOR_GREEN ">>> " COLOR_RESET);
 
         if (!fgets(line, sizeof(line), stdin)) {
-            printf("\n");
+            printf("\nGoodbye!\n");
             break;
+        }
+
+        // skip empty lines / accidental enters
+        line[strcspn(line, "\n")] = '\0';
+
+        // if the line is empty after stripping
+        if (strlen(line) == 0) {
+            continue;
         }
 
         interpret(line);
