@@ -61,6 +61,11 @@ static Value peek(int distance) {
 }
 
 
+static bool isFalsey(Value value) 
+{
+    return IS_NIL(value) || (IS_BOOL(value) && !AS_BOOL(value));
+}
+
 
 static InterpretResult run() {
     // Reads the byte currently pointed at by the IP and advances the pointer.
@@ -111,6 +116,9 @@ static InterpretResult run() {
             case OP_SUBTRACT:       BINARY_OP(NUMBER_VAL, -); break;
             case OP_MULTIPLY:       BINARY_OP(NUMBER_VAL, *); break;
             case OP_DIVIDE:         BINARY_OP(NUMBER_VAL, /); break;
+            case OP_NOT:
+                push(BOOL_VAL(isFalsey(pop())));
+                break;
             case OP_NEGATE:         // unary negation 
                 // check value on top of stack is a number
                 if (!IS_NUMBER(peek(0))) {
