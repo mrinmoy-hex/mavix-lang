@@ -3,10 +3,6 @@
 #include "memory.h"
 
 
-// ============================================================================
-// MEMORY ALLOCATION & DEALLOCATION
-// ============================================================================
-
 /**
  * Central memory management function for the entire VM
  * Handles allocation, reallocation, and deallocation of memory
@@ -33,7 +29,7 @@
  * @return  Pointer to the allocated memory, or NULL if newSize was 0
  */
 void* reallocate(void* pointer, size_t oldSize, size_t newSize) {
-    // Handle deallocation: if requested size is 0, free and return NULL
+    // Handle deallocation
     if (newSize == 0) {
         free(pointer);
         return NULL;
@@ -46,9 +42,6 @@ void* reallocate(void* pointer, size_t oldSize, size_t newSize) {
     // Check for allocation failure
     // If realloc returns NULL, it means memory allocation failed
     if (result == NULL) {
-        // Exit immediately to prevent undefined behavior or data corruption
-        // In a production system, you might want to print an error first:
-        // fprintf(stderr, "Memory allocation failed: could not allocate %zu bytes\n", newSize);
         exit(1);
     }
 

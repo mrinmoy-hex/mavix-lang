@@ -70,7 +70,7 @@ static InterpretResult run() {
     // constant value from the chunk's constant pool.
 #define READ_CONSTANT() (vm.chunk->constants.values[READ_BYTE()])
 
-#define BINARY_OP(op) \
+#define BINARY_OP(valueType, op) \
     do { \
         if (!IS_NUMBER(peek(0)) || !IS_NUMBER(peek(0))) { \
             runtimeError("Operands must be numbers.");  \
@@ -78,7 +78,7 @@ static InterpretResult run() {
         }   \
         double b = AS_NUMBER(pop()); \
         double a = AS_NUMBER(pop()); \
-        push(ValueType(a op b)); \
+        push(valueType(a op b)); \
     } while(false)
 
     for (;;) {
@@ -104,6 +104,9 @@ static InterpretResult run() {
                 push(constant);
                 break;
             }
+            case OP_NIL:            push(NIL_VAL); break;
+            case OP_TRUE:           push(BOOL_VAL(true)); break;
+            case OP_FALSE:          push(BOOL_VAL(false)); break;
             case OP_ADD:            BINARY_OP(NUMBER_VAL, +); break;
             case OP_SUBTRACT:       BINARY_OP(NUMBER_VAL, -); break;
             case OP_MULTIPLY:       BINARY_OP(NUMBER_VAL, *); break;
