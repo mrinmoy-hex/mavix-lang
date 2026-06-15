@@ -17,7 +17,12 @@ static void resetStack() {
 }
 
 
-//
+/*
+Prints an error message to stderr and resets the stack. 
+The function takes a format string and a variable number of arguments, similar to printf. 
+It uses va_list to handle the variable arguments, formats the error message, and prints it to stderr. It also prints the line number of the instruction that caused the error, which is calculated by subtracting the current instruction pointer (vm.ip) from the start of the chunk's code and looking up the corresponding line number in the chunk's lines array.
+ Finally, it calls resetStack() to clear the stack.
+*/ 
 static void runtimeError(const char* format, ...) {
     va_list args;       // pass arbitrary number of args
     va_start(args, format);
@@ -25,7 +30,7 @@ static void runtimeError(const char* format, ...) {
     va_end(args);
     fputs("\n", stderr);
 
-    size_t instruction = vm.ip - vm.chunk->code - 1;
+    size_t instruction = vm.ip - vm.chunk->code - 1;    // -1 because the interpreter advances past each instruction before executing it
     int line = vm.chunk->lines[instruction];
     fprintf(stderr, "[line %d] in script\n", line);
     resetStack();
@@ -41,7 +46,6 @@ void freeVM() {
 }
 
 // Stack Operations
-
 void push(Value value) {
     *vm.stackTop = value;
     vm.stackTop++;
@@ -53,8 +57,9 @@ Value pop() {
 }
 
 static Value peek(int distance) {
-    return vm.stackTop[-1 - distance];
+    return vm.stackTop[-1 - distance];  // -1 because stackTop points to the next empty slot in the stack array
 }
+
 
 
 static InterpretResult run() {
@@ -67,9 +72,13 @@ static InterpretResult run() {
 
 #define BINARY_OP(op) \
     do { \
-        double b = pop(); \
-        double a = pop(); \
-        push (a op b); \
+        if (!IS_NUMBER(peek(0)) || !IS_NUMBER(peek(0))) { \
+            runtimeError("Operands must be numbers.");  \
+            return INTERPRET_RUNTIME_ERROR; \
+        }   \
+        double b = AS_NUMBER(pop()); \
+        double a = AS_NUMBER(pop()); \
+        push(ValueType(a op b)); \
     } while(false)
 
     for (;;) {
@@ -95,10 +104,10 @@ static InterpretResult run() {
                 push(constant);
                 break;
             }
-            case OP_ADD:            BINARY_OP(+); break;
-            case OP_SUBTRACT:       BINARY_OP(-); break;
-            case OP_MULTIPLY:       BINARY_OP(*); break;
-            case OP_DIVIDE:         BINARY_OP(/); break;
+            case OP_ADD:            BINARY_OP(NUMBER_VAL, +); break;
+            case OP_SUBTRACT:       BINARY_OP(NUMBER_VAL, -); break;
+            case OP_MULTIPLY:       BINARY_OP(NUMBER_VAL, *); break;
+            case OP_DIVIDE:         BINARY_OP(NUMBER_VAL, /); break;
             case OP_NEGATE:         // unary negation 
                 // check value on top of stack is a number
                 if (!IS_NUMBER(peek(0))) {
