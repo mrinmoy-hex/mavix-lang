@@ -25,7 +25,7 @@ static void repl() {
         printf(COLOR_GREEN ">>> " COLOR_RESET);
 
         if (!fgets(line, sizeof(line), stdin)) {
-            printf("\nGoodbye!\n");
+            printf(COLOR_GRAY "\nGoodbye!\n" COLOR_RESET);
             break;
         }
 
