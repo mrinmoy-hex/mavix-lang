@@ -1,11 +1,12 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include "common.h"
 #include "chunk.h"
 #include "debug.h"
 #include "vm.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 // ANSI Color Escape Codes
 #define COLOR_RESET   "\x1b[0m"
@@ -34,6 +35,20 @@ static void repl() {
 
         // if the line is empty after stripping
         if (strlen(line) == 0) {
+            continue;
+        }
+
+        if (strcmp(line, "mavix") == 0) {
+            printf("\n");
+            printf(COLOR_CYAN  " ═══ MAVIX VIRTUAL MACHINE CORE ═══\n" COLOR_RESET);
+            printf(COLOR_GRAY  " ├─ Status:    " COLOR_GREEN "ACTIVE\n" COLOR_RESET);
+            printf(COLOR_GRAY  " ├─ Type:      Dynamic Bytecode Interpreter\n" COLOR_RESET);
+            printf(COLOR_GRAY  " ├─ Architecture: 8-bit Opcode / Stack-Based\n" COLOR_RESET);
+            printf(COLOR_GRAY  " ├─ Limits:    Stack Max (256 Values), Constants Max (256)\n" COLOR_RESET);
+            printf(COLOR_GRAY  " └─ Developer: " COLOR_CYAN  "Mrinmoy Deka (The Architect)\n\n" COLOR_RESET);
+            
+            printf(COLOR_GREEN " \"The question isn't who is going to let me;\n" COLOR_RESET);
+            printf(COLOR_GREEN "  it's who is going to stop me.\"\n\n" COLOR_RESET);
             continue;
         }
 
